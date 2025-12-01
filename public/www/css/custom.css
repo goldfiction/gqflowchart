@@ -1,0 +1,127 @@
+.reset-styles {
+    all: unset;
+}
+
+.posabs{
+    position:absolute;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+}
+
+.resizable-div {
+    width: 200px;
+    /* Initial width */
+    height: 150px;
+    /* Initial height */
+    border: 1px solid #ccc;
+    /* Optional: Add a border for visibility */
+    overflow: auto;
+    /* Required for the resize property to work */
+    resize: both;
+    /* Allows both horizontal and vertical resizing */
+    /* Other options for resize: */
+    /* resize: horizontal; */
+    /* Allows only horizontal resizing */
+    /* resize: vertical; */
+    /* Allows only vertical resizing */
+    /* resize: none; */
+    /* Disables resizing (default for most elements) */
+}
+
+.fullimage img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+#fileSelector{
+    background-color: transparent;
+    position: absolute;
+    width: 90px;
+    height: 12px;
+    font-size: 6;
+}
+
+#fileSelector button{
+    padding: 0;
+    margin: 0;
+    font-size: 6px;
+}
+
+#editorcursor{
+    background-color: #555;
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    font-size: 12;
+}
+
+.editorbutton :hover{
+        background-color: #999;
+        height:24px;
+        width:24px;
+}
+
+#editorcursor img{
+    vertical-align: top;
+}
+
+.editor{
+    width: 500px;
+    height: 300px;
+    position: absolute;
+}
+
+.ace_editor :hover{
+    opacity:0.9;
+}
+
+.editorbutton {
+    background-color: #555;
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    font-size: 12;
+    top:16px;
+}
+
+#editorsave button,
+#editorclose button,
+.editorbutton button,
+.editorbutton button i {
+    background-color: transparent;
+    position:absolute;
+    border:0;
+    padding:none;
+    place-content: center;
+    padding-inline: 0;
+    padding-block: 0;
+    margin:none;
+    width: 12px;
+    height: 12px;
+    font-size: 6px;
+    top:0px;
+    left:0px;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+    padding:0;
+    margin:0;
+    font-size: 6px;
+}
+
+.ediv{
+    width:0px;
+    height:0px;
+}
+
+.resizable-div{
+    border:1px solid #6f6
+}

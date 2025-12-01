@@ -1,0 +1,12 @@
+<div id="output" style="width:100%;height:100%;"></div>
+<script>
+    // In new-page.html
+    $(document).ready(function () {
+        $('#output').text("hello");
+        var sharedDataString = localStorage.getItem('downloadData');
+        if (sharedDataString) {
+            $('#output').html(sharedDataString);
+            localStorage.removeItem('downloadData'); // Optional: remove data after use
+        }
+    });
+</script>

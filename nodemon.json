@@ -1,0 +1,21 @@
+{
+    "restartable": "rs",
+    "ignore": [
+      ".git",
+      "node_modules/**/node_modules"
+    ],
+    "verbose": false,
+    "watch": [
+        "test/",
+        "*.coffee",
+        "*.js",
+        "*.json"
+    ],
+    "env": {
+      "NODE_ENV": "development"
+    },
+    "ext": "coffee,json",
+    "events": {
+        "restart": "echo \"App restarted due to:\n'$FILENAME'\" with title \"nodemon\""
+    }
+  }

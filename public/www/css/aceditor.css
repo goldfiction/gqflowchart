@@ -1,0 +1,59 @@
+.toolbar {
+    background-color: lightgray;
+    background: linear-gradient(to bottom, #f7f7f7 0%, #bababa 100%);
+}
+
+.toolbar>.navbar {
+    min-height: 0;
+}
+
+.toolbar>.navbar>.btn-group {
+    margin: 5px;
+}
+
+.statusbar {
+    color: white;
+    background-color: #007ACC;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+}
+
+.statusbar>.navbar {
+    min-height: 0;
+    margin: 0;
+}
+
+.statusbar>.navbar>.btn-group {
+    margin: 0px 7px 0px 7px;
+}
+
+.statusbar .btn {
+    font-size: 85%;
+    color: white;
+    background: none;
+    border: none;
+    border-radius: 0px;
+    padding: 3px 6px;
+}
+
+.statusbar .btn:hover {
+    background-color: #008DDF;
+}
+
+.statusbar .btn:active,
+.statusbar .btn-group.open .btn {
+    color: white;
+    background-color: #0070C1;
+}
+
+#e1 .editor {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 400px;
+}
+
+.ace_editor {
+    opacity: 0.7;
+}

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Flowchart</title>
+
+        <script src="/js/jquery-3.7.1.min.js"></script>
+        <script src="https://unpkg.com/jquery-position-event"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        <link rel="stylesheet" href="/css/jquery-ui.css">
+        <link rel="stylesheet" href="/css/aceditor.css">
+        <link rel="stylesheet" href="/css/custom.css">
+
+        <script src="/js/bootstrap.min.js"></script>
+        <script src="/js/jquery-ui.min.js"></script>
+        <script src="/js/draggable.js"></script>
+
+        <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.34.0/js/jquery.terminal.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.34.0/css/jquery.terminal.css" />
+
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
+    </head>
+<body>
+    <div id="start"></div>
+    <div id="etemplate" style="display:none;">
+        <div id="editorcursor" class="editorcursor editorbutton fullimage" title="Move" style="z-index:100">
+            <img src="/images/drag-handle.svg" alt="Sample Image">
+        </div>
+        <div id="editorclose" class="editorclose editorbutton" title="Close" style="z-index:100">
+            <button type="button" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div id="editorsave" class="editorsave editorbutton" title="Save" style="z-index:100">
+            <button type="button" aria-label="Save">
+                <i class="fa-solid fa-save"></i>
+            </button>
+        </div>
+        <div id="editor" class="editor resizable-div" style="z-index:10"></div>
+    </div>
+
+        <div id="fileSelector">
+            <input type="file" id="fileInput" style="display: none;" class="posabs">
+            <button id="selectFileButton" class="posabs">Select File</button>
+        </div>        
+
+        <div id="editorplus" class="editorplus editorbutton" title="New Editor">
+            <button type="button" aria-label="New Editor">
+                <i class="fa fa-plus">editor</i>
+            </button>
+        </div>
+
+        <div>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" id="myFile" name="myFile" />
+                <button type="submit" id="uploadButton">Upload</button>
+            </form>
+        </div>
+
+        <div>
+            <form id="downloadForm">
+                <input type="text" id="file" name="file" style="width:290px;"/>
+                <button type="submit" id="downloadButton">Download</button>
+            </form>
+        </div>
+
+        <div id="my-terminal"></div>
+
+        <script src="/js/pixi.min.js"></script>
+        <script src="/js/pixitest2.js"></script>
+        <script src="/ace/src-min/ace.js"></script>
+        <script src="/js/aceeditor.js"></script>
+        <script src="/js/ace-toolbar.js"></script>
+        <!-- <script src="/js/ace-toolbar-load.js"></script> -->
+        <script src="/js/myterminal.js"></script>
+        <script src="/js/custom.js"></script>
+</body>
+</html>
