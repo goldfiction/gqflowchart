@@ -1,11 +1,13 @@
 //index.js
 
+const https = require('https');
 const express = require('express');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 
 var Datastore = require('nedb')
     , db = new Datastore({ filename: '~/.gqflow/nedb.json', autoload: true });
+db.ensureIndex({ fieldName: 'id', unique: true });
 
 var gqfs = require('gqfs');
 gqfs = gqfs.gqfs;
@@ -14,6 +16,11 @@ var fs=require('fs')
 
 var _l = require('gqlodash').gqlodash
 var doq=require('gqdoq')
+
+const options = {
+    key: fs.readFileSync('./private/key.pem'),
+    cert: fs.readFileSync('./private/cert.pem')
+};
 
 const path = require('path');
 const { exec } = require('child_process');
@@ -107,6 +114,7 @@ app.post('/editorcontent', (req, res) => {
 
 app.post('/folder', (req, res) => {
     try {
+        req.body.path = path.normalize(req.body.path)
         files = gqfs.dir(req.body.path)
         files.mapLimit(3, function (file, cb) { 
             stats = gqfs.stat(req.body.path + "/" + file)
@@ -141,4 +149,7 @@ app.get('/hello', (req, res) => {
 
 app.listen(80, () => {
     console.log('server listening on port 80')
+    https.createServer(options, app).listen(443, () => { 
+        console.log('ssl server listening on port 443')
+    })
 })

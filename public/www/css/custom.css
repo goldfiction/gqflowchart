@@ -48,9 +48,9 @@ body {
     font-size: 6;
 }
 
-.buttonbutton,
-.bottombutton button{
-    position: absolute;
+.bottonbutton,
+.bottombutton button,
+.bottombutton div{
     padding: 0;
     margin: 0;
     font-size: 8px;
@@ -59,7 +59,7 @@ body {
     background-color: #555;
 }
 
-.buttonbutton:hover,
+.bottombutton div:hover,
 .bottombutton button:hover {
     background-color: #888;
 }
@@ -180,7 +180,45 @@ textarea {
 
 div.filegroup{
     position: absolute;
-    z-index: 10;
     top:200px;
     background-color: #aaa;
+    opacity:0.7;
+    overflow:auto;
+    max-height:400px;
+}
+
+div.filegroup:hover {
+    opacity:0.9;
+}
+
+.keyboard-wrapper{
+    position:absolute;
+    z-index:1000;
+    width:600px;
+    height:300px;
+    max-width: 850px;}
+
+.simple-keyboard.myTheme1 {
+    background-color: rgba(50, 50, 50, 0.8);
+    border-radius: 1;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.simple-keyboard.myTheme1 .hg-button {
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(50, 50, 50, 0.5);
+    color: white;
+}
+
+.simple-keyboard.myTheme1 .hg-button:active {
+    background: #1c4995;
+    color: white;
+}
+
+#root .simple-keyboard.myTheme1+.simple-keyboard-preview {
+    background: #1c4995;
 }

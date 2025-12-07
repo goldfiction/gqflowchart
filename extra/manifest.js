@@ -37,8 +37,12 @@ change theme
 ctrl + s save file
 ctrl + +/- change font size
 force save layout button
-soft keyboard mod 
+vv soft keyboard mod 
+vv hook keyboard keypress to input
+fix { enter } keys
 voice input
+keyboard toggle button
+
 open / close script block 
 regular index.js runner
 external script block
@@ -46,6 +50,12 @@ form block
 app.get block
 reset file
 recent file
+vv on resize event
+vv _id different for upsert
+open folder need to clean innerHTML
+
+
+vv open folder command
 
 edited color Change
 zindex reorder on focus

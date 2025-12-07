@@ -1,5 +1,9 @@
+//custom.js
+
 var editorContent = null;
 var editorIDCount = 0;
+var myKeyboard = null;
+var currentFocusedEditorId = null;
 
 function getEditorContent() {
     return new Promise((resolve) => {
@@ -60,26 +64,35 @@ function resetTree() {
 
 }
 
+function compactPath(path) { 
+    return path.split('/').slice(-2).join('/')
+}
+
 function updateFolder(data, path) { 
     //console.log(data)
-    $('.main-tree').append("<li class=\"tree-title\">" + path + "</li><ul class=\"tree\"></ul>");
+    
+    $('.main-tree').empty()
+    $('.main-tree').append("<li class=\"tree-title\">" + compactPath(path) + "</li><ul class=\"tree folder-item\" path=\"" + path + "/../" +"\"></ul>");
     elem = $('.main-tree ul').append("<li class=\"tree-title\">..</li>")
     data.forEach((file) => {
         if (file.type == "folder")
-            elem = elem.before("<ul class=\"tree\" style=\"display: none;\"><li class=\"tree-title\">"+file.file+"</li></ul>")
+            elem = elem.before("<ul class=\"tree folder-item\" style=\"display: none;\" path=\"" + file.path +"\"><li class=\"tree-title\">"+file.file+"</li></ul>")
     })
     data.forEach((file) => {
         if (file.type == "file") {
-            elem = elem.before("<li class=\"tree-item file-item\" style=\"display: none;\" path=\""+file.path+"\">" + file.file + "</li>")
+            elem = elem.before("<li class=\"tree tree-item file-item\" style=\"display: none;\" path=\""+file.path+"\">" + file.file + "</li>")
         }
     })
     $(".file-item").click(function (elem) {
         console.log("try to open file: " + $(this).attr("path"));
         openFileByPath($(this).attr("path"))
     })
-
+    $(".folder-item").click(function (elem) {
+        console.log("try to open folder: " + $(this).attr("path"));
+        openFolder($(this).attr("path"))
+    })
     resetTree()
-
+    $('body').find('.tree').fadeIn(0);
 }
 
 function reopenEditor() {
@@ -140,7 +153,7 @@ function openFile(file,data) {
     editorContent.editor[editorIDCount].id = editorIDCount;
     editorContent.editor[editorIDCount].enabled = true;
     editorContent.editorIDCount = ++editorIDCount;
-    localStorage.setItem("editorContent", JSON.stringify(editorContent))
+    saveEditorContent()
 }
 
 function getElementByXPath(path) {
@@ -203,7 +216,8 @@ function saveFile(id) {
             url: "/write",
             data: { file: file, content: content },
             success: function (data, status, XHR) {
-                alert("File saved: "+file)
+                //alert("File saved: "+file)
+                console.log("File saved: " + file)
             },
             dataType: "text"
         });
@@ -276,6 +290,7 @@ function neweditor(id) {
         console.log("try to save tab id: " + id)
         saveFile(id)
     })
+    //addFocusForKeyboard($("#e" + id + " .editor"))
     //editorContent.editor[id].enabled = true;
     
     /*
@@ -313,6 +328,11 @@ function neweditor(id) {
     var ui = $("#e" + id + " .editorcursor")
     ui.offset({ top: 170, left: 20 })
     syncButtons(id)
+    
+    editor.on("focus", function () {
+        currentFocusedEditorId = id;
+    });
+    
     return editor;
 }
 
@@ -425,6 +445,73 @@ function scrollable() {
     });
 }
 
+function onChange(input) {
+    //document.querySelector(".input").value = input;
+    console.log("Input changed", input);
+}
+
+function onKeyPress(button) {
+    console.log("Button pressed", button);
+    // Create a keydown event for the Enter key
+    keyCode = button.charCodeAt(0)
+    console.log(keyCode)
+    var enterEvent = jQuery.Event("keydown");
+    enterEvent.keyCode = keyCode;
+    enterEvent.which = keyCode;
+    if (button === "{shift}" || button === "{lock}")
+        handleShift()
+    else 
+        insertCharToEditor("editor" + currentFocusedEditorId, button)
+
+}
+
+function handleShift() {
+    let currentLayout = myKeyboard.options.layoutName;
+    let shiftToggle = currentLayout === "default" ? "shift" : "default";
+
+    myKeyboard.setOptions({
+        layoutName: shiftToggle
+    });
+}
+
+
+function addFocusForKeyboard(myInput) {
+    myInput[0].addEventListener("focus", () => {
+        myKeyboard.setInput(myInput[0].value); // Set keyboard's initial input to the field's current value
+    });
+}
+
+function insertCharToEditor(editorId,char) { 
+    // Assuming 'editor' is your Ace Editor instance
+    var editor = ace.edit(editorId); // Replace "yourEditorId" with the ID of your editor's container
+
+    // Get the current cursor position
+    var cursorPosition = editor.getCursorPosition();
+
+    // Define the character you want to insert
+    var characterToInsert = char; // Or any other character
+
+    // Insert the character at the cursor position
+    editor.session.insert(cursorPosition, characterToInsert);
+}
+
+function onresize() { 
+    $("#editorplus").css({ top: ($(window).height() - 30), left: 10 })
+    $("#fileSelector").css({ top: ($(window).height() - 30), left: 100 })
+    $("#voiceInput").css({ top: ($(window).height() - 30), left: 200 })
+    $(".keyboard-wrapper").css({ top: ($(window).height() - 320) })
+}
+
+function attachVoiceRecognition() { 
+    $('#startVoiceInput').on('click', function () {
+        recognition.start(); // Start the speech recognition
+    });
+
+    $('#stopVoiceInput').on('click', function () {
+        recognition.stop(); // Stop the speech recognition
+    });
+}
+
 $(document).ready(async function () {
     await getEditorContent()
 
@@ -432,12 +519,10 @@ $(document).ready(async function () {
     downloadForm();
     dropzone();
 
-    $("#editorplus").css({ top: ($(window).height() - 30), left: 10 })
     $("#editorplus").click(function () { 
         neweditor(++editorIDCount)
     })
 
-    $("#fileSelector").css({ top: ($(window).height() - 30), left: 100 })
     $("#selectFileButton").on("click", function () {
         $("#fileInput").trigger("click"); // Simulate a click on the hidden file input
     });
@@ -471,7 +556,38 @@ $(document).ready(async function () {
         }
     });
 
+    Keyboard = window.SimpleKeyboard.default;
+
+    myKeyboard = new Keyboard({
+        onChange: input => onChange(input),
+        onKeyPress: button => onKeyPress(button),
+        theme: "hg-theme-default hg-layout-default myTheme1"
+    });
+
+    $(".keyboard-wrapper").mousedown(function (e) {
+        handle_mousedown($(".keyboard-wrapper"), e, function () {
+        })
+    });
+
     reopenEditor()
     scrollable()
     openFolder('./')
+    //addFocusForKeyboard($("#my-terminal"))
+    attachVoiceRecognition()
+    onresize()
+    $(window).on('resize', function () {
+        // Code to execute when the window is resized
+        console.log("Window resized!");
+
+        // Example: Get and display the new window dimensions
+        var newWidth = $(window).width();
+        var newHeight = $(window).height();
+        console.log('New width: ' + newWidth + ', New height: ' + newHeight);
+
+        // You can add more complex logic here, such as:
+        // - Adjusting element sizes or positions
+        // - Changing CSS properties based on window size
+        // - Triggering other functions or events
+        onresize();
+    });
  });
