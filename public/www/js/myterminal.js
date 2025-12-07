@@ -8,12 +8,24 @@ function openTextInNewTab(title, content) {
     }
 }
 
+function scrollBottom() {
+    setTimeout(function () {
+        myDiv = document.getElementById('terminalgroup');
+        //myDiv.scrollTop = myDiv.scrollHeight; 
+
+        myDiv.scrollTo({
+            top: myDiv.scrollHeight,
+            behavior: 'smooth'
+        });        
+    },20)
+}
+
 $(function () {
     $('#my-terminal').terminal(function (command) {
         if (command === 'hello') {
             this.echo('Hello, world!');
         } else if (command === 'help') {
-            this.echo('Available commands: hello, help');
+            this.echo('Available commands: open, download, hello, help and shell command');
         } else if (command.indexOf('open') != -1) { 
             file = command.split(' ').slice(1).join(' ')
             console.log("open file: " + file)
@@ -22,7 +34,8 @@ $(function () {
                 url: "/download",
                 data: { file: file },
                 success: function (data, status, XHR) {
-                    openFile(file,data)
+                    openFile(file, data)
+                    scrollBottom()
                 },
                 dataType: "text"
             });
@@ -34,7 +47,8 @@ $(function () {
                 url: "/download",
                 data: { file:file },
                 success: function (data, status, XHR) {
-                    openTextInNewTab("file",data)
+                    openTextInNewTab("file", data)
+                    scrollBottom()
                 },
                 dataType: "text"
             });
@@ -47,10 +61,13 @@ $(function () {
                 success: function (data, status, XHR) { 
                     console.log(data);
                     that.echo(data);
+                    scrollBottom()
                 },
                 dataType: "text"
             });
+
         }
+
     }, {
         greetings: 'Welcome to your simulated terminal!',
         prompt: 'user@web-terminal:~$'

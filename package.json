@@ -14,7 +14,9 @@
     "pug":"",
     "sjson5":"",
     "multer":"",
-    "gqfs":""
+    "gqfs":"",
+    "gqlodash":"",
+    "gqdoq":""
   },
   "devDependencies": {
     "gqtest": "latest",
@@ -22,7 +24,7 @@
     "nodemon": "3.1.10"
   },
   "scripts": {
-    "start": "node index.js",
+    "start": "node --require coffeescript/register index.js",
     "test": "coffee test.coffee",
     "test:watch": "nodemon --delay 2 -q -x \"npm test\"",
     "test:slow": "mocha --openssl-legacy-provider --require coffeescript/register --no-color --reporter min -t 20000 test/test.slow.coffee",

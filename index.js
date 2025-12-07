@@ -4,8 +4,16 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 
+var Datastore = require('nedb')
+    , db = new Datastore({ filename: '~/.gqflow/nedb.json', autoload: true });
+
 var gqfs = require('gqfs');
 gqfs = gqfs.gqfs;
+
+var fs=require('fs')
+
+var _l = require('gqlodash').gqlodash
+var doq=require('gqdoq')
 
 const path = require('path');
 const { exec } = require('child_process');
@@ -75,6 +83,47 @@ app.post('/write', (req, res) => {
     res.send(msg)
     console.log(msg)
 });
+
+app.post('/geteditorcontent', (req, res) => {
+    db.find({id:1}, function (err, docs) {   // Callback is optional
+        if (docs.length >= 1) {
+            res.status(200).send(docs[0].content);
+            
+        } else {
+            res.status(400).send("failed to find document")
+        }
+    });
+})
+
+app.post('/editorcontent', (req, res) => {
+    if (!req.body.content) {
+        return res.status(400).send('No file content.');
+    }
+    db.update({ id: 1 }, { $set: { content: req.body.content } }, { upsert: true }, function (err, numReplaced, upsert) {
+        res.status(200).send("OK");
+        console.log("editorcontent saved!")
+    });
+})
+
+app.post('/folder', (req, res) => {
+    try {
+        files = gqfs.dir(req.body.path)
+        files.mapLimit(3, function (file, cb) { 
+            stats = gqfs.stat(req.body.path + "/" + file)
+            realpath = fs.realpathSync(req.body.path + "/" + file)
+            if (stats.isFile())
+                cb(null, { file: file, type: "file", path: realpath })
+            else if (stats.isDirectory())
+                cb(null, { file: file, type: "folder", path: realpath })
+            else
+                cb(null, { file: file, type: "other", path: realpath })
+        }, function (e,r) {
+            res.send(JSON.stringify(r))                    
+        })
+    } catch (e) {
+        res.send("[]")
+    }
+})
 
 app.post('/cmd', (req, res) => { 
     console.log(req.body)

@@ -8,11 +8,13 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         <link rel="stylesheet" href="/css/jquery-ui.css">
         <link rel="stylesheet" href="/css/aceditor.css">
+        <link href="css/filetree.css" rel="stylesheet">
         <link rel="stylesheet" href="/css/custom.css">
 
         <script src="/js/bootstrap.min.js"></script>
         <script src="/js/jquery-ui.min.js"></script>
         <script src="/js/draggable.js"></script>
+
 
         <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.34.0/js/jquery.terminal.min.js"></script>
@@ -24,7 +26,10 @@
     <div id="start"></div>
     <div id="etemplate" style="display:none;">
         <div id="editorcursor" class="editorcursor editorbutton fullimage" title="Move" style="z-index:100">
-            <img src="/images/drag-handle.svg" alt="Sample Image">
+            <!--  <img src="/images/drag-handle.svg" alt="Sample Image">  -->
+            <button type="button" aria-label="Move">
+                <i class="fa-solid fa-grip-vertical"></i>
+            </button>            
         </div>
         <div id="editorclose" class="editorclose editorbutton" title="Close" style="z-index:100">
             <button type="button" aria-label="Close">
@@ -38,16 +43,26 @@
         </div>
         <div id="editor" class="editor resizable-div" style="z-index:10"></div>
     </div>
-
-        <div id="fileSelector">
-            <input type="file" id="fileInput" style="display: none;" class="posabs">
-            <button id="selectFileButton" class="posabs">Select File</button>
+    <div>
+        <div id="fileSelector" class="editorplus bottombutton posabs" title="Select File">
+            <input type="file" id="fileInput" class="displaynone">
+            <button id="selectFileButton">Select File</button>
         </div>        
 
-        <div id="editorplus" class="editorplus editorbutton" title="New Editor">
+        <div id="editorplus" class="editorplus bottombutton posabs" title="New Editor">
             <button type="button" aria-label="New Editor">
                 <i class="fa fa-plus">editor</i>
             </button>
+        </div>
+
+        
+    </div>
+    <div id="terminalgroup" class="divgroup resizable-div scrollable-div">
+        <div id="my-terminal"></div>
+    </div>
+    <div id="dropgroup" class="divgroup resizable-div">
+        <div id="dropzone">
+            Drop files here
         </div>
 
         <div>
@@ -63,8 +78,40 @@
                 <button type="submit" id="downloadButton">Download</button>
             </form>
         </div>
+    </div>
 
-        <div id="my-terminal"></div>
+    <!--
+    <div class="filegroup">
+        <div class="filetree">
+            <ul class="main-tree">
+                <li class="tree-title">photos-2015</li>
+                <ul class="tree">
+                    <li class="tree-title">beach</li>
+                    <li class="tree-item">0-2015-01-01.jpg</li>
+                    <li class="tree-item">1-2015-01-02.jpg</li>
+                    <li class="tree-item">2-2015-01-03.jpg</li>
+                </ul>
+                <ul class="tree">
+                    <li class="tree-title">disneyland</li>
+                    <li class="tree-item">3-2015-02-01.jpg</li>
+                    <li class="tree-item">7-2015-02-02.jpg</li>
+                    <li class="tree-item">8-2015-02-03.jpg</li>
+                    <ul class="tree">
+                        <li class="tree-title">birthday party</li>
+                        <li class="tree-item">4-2015-02-01.jpg</li>
+                        <li class="tree-item">5-2015-02-01.jpg</li>
+                        <li class="tree-item">6-2015-02-01.jpg</li>
+                    </ul>
+                </ul>
+            </ul>
+        </div>
+    </div> -->
+    <div class="filegroup">
+        <div class="filetree">
+            <ul class="main-tree">
+            </ul>
+        </div>
+    </div>
 
         <script src="/js/pixi.min.js"></script>
         <script src="/js/pixitest2.js"></script>
@@ -73,6 +120,7 @@
         <script src="/js/ace-toolbar.js"></script>
         <!-- <script src="/js/ace-toolbar-load.js"></script> -->
         <script src="/js/myterminal.js"></script>
+        <script src="js/filetree.js"></script>
         <script src="/js/custom.js"></script>
 </body>
 </html>

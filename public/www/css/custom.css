@@ -6,6 +6,10 @@
     position:absolute;
 }
 
+.displaynone{
+    display:none;
+}
+
 body {
     margin: 0;
     overflow: hidden;
@@ -38,17 +42,26 @@ body {
 }
 
 #fileSelector{
-    background-color: transparent;
-    position: absolute;
+
     width: 90px;
     height: 12px;
     font-size: 6;
 }
 
-#fileSelector button{
+.buttonbutton,
+.bottombutton button{
+    position: absolute;
     padding: 0;
     margin: 0;
-    font-size: 6px;
+    font-size: 8px;
+    font-style: none;
+    font-weight: none;
+    background-color: #555;
+}
+
+.buttonbutton:hover,
+.bottombutton button:hover {
+    background-color: #888;
 }
 
 #editorcursor{
@@ -124,4 +137,50 @@ textarea {
 
 .resizable-div{
     border:1px solid #6f6
+}
+
+#dropzone {
+    border: 2px dashed #ccc;
+    width: 300px;
+    height: 80px;
+    background-color: white;
+    opacity: 0.5;
+}
+
+#dropzone:hover {
+    background-color: lightblue;;
+}
+
+.divgroup{
+    width:940px;
+    background-color: transparent;
+    position:absolute;
+}
+
+#dropgroup{
+    top:400px;
+    width:40px;
+    background-color: transparent;
+}
+
+#terminalgroup{
+    width:100%;
+    z-index:1;
+    background-color: #000;
+}
+
+.scrollable-div {
+    /* Or max-height */
+    overflow-y: auto;
+    /* For vertical scrolling */
+    /* overflow-x: auto; for horizontal scrolling */
+    /* overflow: auto; for both vertical and horizontal if needed */
+    /* Optional: for visual clarity */
+}
+
+div.filegroup{
+    position: absolute;
+    z-index: 10;
+    top:200px;
+    background-color: #aaa;
 }
