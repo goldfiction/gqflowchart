@@ -222,3 +222,8 @@ div.filegroup:hover {
 #root .simple-keyboard.myTheme1+.simple-keyboard-preview {
     background: #1c4995;
 }
+.themeform {
+    position:absolute;
+    top:0px;
+    left:0px;
+}

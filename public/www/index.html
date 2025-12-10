@@ -49,6 +49,30 @@
                 <i class="fa-solid fa-save"></i>
             </button>
         </div>
+        <div id="editorsaveas" class="editorsaveas editorbutton" title="Save As">
+            <button type="button" aria-label="Save As">
+                <i class="fa-solid fa-floppy-disk"></i>
+            </button>
+        </div>
+        <div id="editorsavecontinous" class="editorsavecontinous editorbutton" title="Save Continous">
+            <button type="button" aria-label="Save Continous">
+                <i class="fa-solid fa-floppy-disk"></i>
+            </button>
+        </div>
+        <div id="selecttheme" class="selecttheme editorbutton" title="Select Theme">
+            <button type="button" aria-label="Select Theme">
+                <i class="fa-solid fa-th"></i>
+            </button>
+        </div>
+        
+        <div id="themeform" class="themeform posabs" style="display:none; z-index:1000;">
+            <form>
+                <label for="theme-select">Choose a theme:</label>
+                <select id="theme-select" class="theme-select" name="themeOptioon">
+                </select>
+            </form>
+        </div>
+
     </div>
     <div>
         <div id="fileSelector" class="editorplus bottombutton posabs" title="Select File">
@@ -66,7 +90,22 @@
             <div id="startVoiceInput">Start Voice Input</div>
             <div id="stopVoiceInput">Stop Voice Input</div>
         </div>
+
+        <div id="togglesoftkeyboard" class="togglesoftkeyboard bottombutton posabs" title="Soft Keyboard">
+            <button type="button" aria-label="Soft Keyboard">
+                <i class="fa fa-keyboard-o">Soft Keyboards</i>
+            </button>
+        </div>
         
+        <div id="savelayout" class="savelayout bottombutton posabs" title="Save Layout">
+            <button type="button" aria-label="Save Layout">
+                <i class="fa fa-save">Save Layout</i>
+            </button>
+        </div>
+
+
+
+
     </div>
     <div id="terminalgroup" class="divgroup resizable-div scrollable-div">
         <div id="my-terminal"></div>

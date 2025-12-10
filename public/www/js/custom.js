@@ -250,6 +250,18 @@ function syncButtons(id) {
         top: ui.offset().top + 30,
         left: ui.offset().left
     })
+    $("#e" + id + " .editorsaveas").css({
+        top: ui.offset().top + 45,
+        left: ui.offset().left
+    })
+    $("#e" + id + " .editorsavecontinous").css({
+        top: ui.offset().top + 60,
+        left: ui.offset().left
+    })
+    $("#e" + id + " .selecttheme").css({
+        top: ui.offset().top + 75,
+        left: ui.offset().left
+    })
     return ui;
 }
 
@@ -290,6 +302,27 @@ function neweditor(id) {
         console.log("try to save tab id: " + id)
         saveFile(id)
     })
+    $("#e" + id + " .editorsaveas").click(function () {
+        console.log("try to save as tab id: " + id)
+        //saveFile(id)
+    })
+    $("#e" + id + " .editorsavecontinous").click(function () {
+        console.log("try to save continously on tab: " + id)
+        //saveFile(id)
+    })
+    var showThemeForm=false
+    $("#e" + id + " .selecttheme").click(function () {
+        console.log("try to select theme on tab: " + id)
+        //saveFile(id)
+        if (showThemeForm) {
+            showThemeForm = false
+            $("#e"+id+" .themeform").fadeOut()
+        } else {
+            showThemeForm = true
+            $("#e" + id + " .themeform").fadeIn()
+        }
+    })
+
     //addFocusForKeyboard($("#e" + id + " .editor"))
     //editorContent.editor[id].enabled = true;
     
@@ -328,6 +361,8 @@ function neweditor(id) {
     var ui = $("#e" + id + " .editorcursor")
     ui.offset({ top: 170, left: 20 })
     syncButtons(id)
+    attachControlKey(id)
+    addThemes(id)
     
     editor.on("focus", function () {
         currentFocusedEditorId = id;
@@ -499,6 +534,9 @@ function onresize() {
     $("#editorplus").css({ top: ($(window).height() - 30), left: 10 })
     $("#fileSelector").css({ top: ($(window).height() - 30), left: 100 })
     $("#voiceInput").css({ top: ($(window).height() - 30), left: 200 })
+    $("#togglesoftkeyboard").css({ top: ($(window).height() - 30), left: 300 })
+    $("#savelayout").css({ top: ($(window).height() - 30), left: 400 })
+
     $(".keyboard-wrapper").css({ top: ($(window).height() - 320) })
 }
 
@@ -511,6 +549,57 @@ function attachVoiceRecognition() {
         recognition.stop(); // Stop the speech recognition
     });
 }
+
+function attachControlKey(id) {
+    var editor = ace.edit("editor" + id);
+    var currentFontSize = editor.getFontSize()
+    $("#editor"+id).keydown(function (event) {
+        // Check if Ctrl key is pressed and the key is 'c' or 'C'
+        if (event.ctrlKey && (event.key === '=' || event.key === '+')) {
+            event.preventDefault(); // Prevent the default copy action if needed
+            console.log("Ctrl++ was pressed!");
+            currentFontSize++
+            editor.setOptions({
+                fontSize: currentFontSize+"px"
+            });
+        } else if (event.ctrlKey && (event.key === '-' || event.key === '_')) {
+            event.preventDefault(); // Prevent the default copy action if needed
+            console.log("Ctrl+- was pressed!");
+            currentFontSize--
+            editor.setOptions({
+                fontSize: currentFontSize + "px"
+            });
+        } else if (event.ctrlKey && (event.key === 's' || event.key === 'S')) {
+            event.preventDefault(); // Prevent the default copy action if needed
+            console.log("Ctrl+s was pressed!");
+            saveFile(id)
+        }
+    });
+}
+
+function addThemes(id) {
+    var editor = ace.edit("editor" + id);
+    var $selectBox = $('#e'+id+' .theme-select');
+    $.ajax({
+        type: "POST",
+        url: "/folder",
+        data: { path: "./public/www/ace/css/theme" },
+        success: function (data, status, XHR) {
+            themes = JSON.parse(data)
+            console.log(themes)
+            themes.forEach((theme) => {
+                var item=theme.file.split('.')[0]
+                var $newOption = $('<option>').val(item).text(item);
+                $selectBox.append($newOption);                
+            })
+            $selectBox.on("change", function (e) {
+                var selectedTheme = $(this).val(); // Get the selected value from the dropdown
+                editor.setTheme("ace/theme/" + selectedTheme);
+            })
+        },
+        dataType: "text"
+    });
+} 
 
 $(document).ready(async function () {
     await getEditorContent()
@@ -568,6 +657,23 @@ $(document).ready(async function () {
         handle_mousedown($(".keyboard-wrapper"), e, function () {
         })
     });
+
+    showkeyboard = false
+    $(".keyboard-wrapper").fadeOut()
+    $('#togglesoftkeyboard').on('click', function () {
+        if (showkeyboard) {
+            showkeyboard = false
+            $(".keyboard-wrapper").fadeOut()
+        } else {
+            showkeyboard = true
+            $(".keyboard-wrapper").fadeIn()           
+        }
+    });
+
+    $("#savelayout button").on("click", function () {
+        console.log("layout saved!")
+        saveEditorContent()
+    })
 
     reopenEditor()
     scrollable()

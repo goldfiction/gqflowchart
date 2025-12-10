@@ -1,5 +1,4 @@
-const { file } = require("googleapis/build/src/apis/file")
-const { run } = require("node:test")
+
 
 // what is my plan for this project
 vv open File
@@ -31,18 +30,21 @@ vv folder TreeWalker
 vv realpath all files
 vv Make file open when click folder tree 
 
-save as button
-continious save file
-change theme
-ctrl + s save file
-ctrl + +/- change font size
-force save layout button
+vv change theme
+vv ctrl + s save file
+vv ctrl + +/- change font size
+vv force save layout button
 vv soft keyboard mod 
 vv hook keyboard keypress to input
-fix { enter } keys
-voice input
-keyboard toggle button
+vv voice input
+vv soft keyboard toggle button
 
+save as button
+continous save file
+fix { enter } keys
+remember theme
+vv path Route
+clean saveEditorContent
 open / close script block 
 regular index.js runner
 external script block
@@ -52,7 +54,8 @@ reset file
 recent file
 vv on resize event
 vv _id different for upsert
-open folder need to clean innerHTML
+vv open folder need to clean innerHTML
+task manager 
 
 
 vv open folder command
@@ -74,15 +77,15 @@ group block for collapse groups
 vv get file absolute path for saving file
 notes button
 code repo
+pastebin integration
 encapsule block
-make db clean 
+vv make db clean 
 zen mode / fullscreen
 maineditor attribute
-task manager 
 mouse cursor 
 vv width height whole number 
 
-gqtest need send bug to user
+vv gqtest need send bug to user
 
 add script block
 add if block

@@ -133,6 +133,12 @@ app.post('/folder', (req, res) => {
     }
 })
 
+app.post('path', (req, res) => { 
+    req.body.path = path.normalize(req.body.path)
+    realpath = fs.realpathSync(req.body.path + "/" + (req.body.file || ""))
+    res.send(realpath)
+})
+
 app.post('/cmd', (req, res) => { 
     console.log(req.body)
     execCmd(req.body.command, function (e, r) {
