@@ -25,10 +25,15 @@ $(function () {
         if (command === 'hello') {
             this.echo('Hello, world!');
         } else if (command === 'help') {
-            this.echo('Available commands: open, openfolder, download, hello, help and shell command');
+            this.echo('Available commands: open, openfolder, save, saveas, download, hello, help and shell command');
         } else if (command.indexOf('openfolder') != -1) {
             path = command.split(' ').slice(1).join(' ')
             openFolder(path)
+        } else if (command.indexOf('saveas') != -1) {
+            path = command.split(' ').slice(1).join(' ')
+            saveFile(currentFocusedEditorId,path)
+        } else if (command.indexOf('save') != -1) {
+            saveFile(currentFocusedEditorId)
         } else if (command.indexOf('open') != -1) { 
             file = command.split(' ').slice(1).join(' ')
             console.log("open file: " + file)

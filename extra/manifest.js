@@ -1,5 +1,3 @@
-
-
 // what is my plan for this project
 vv open File
 vv save File
@@ -39,31 +37,62 @@ vv hook keyboard keypress to input
 vv voice input
 vv soft keyboard toggle button
 
-save as button
-continous save file
-fix { enter } keys
-remember theme
-vv path Route
-clean saveEditorContent
-open / close script block 
-regular index.js runner
-external script block
-form block
-app.get block
-reset file
-recent file
 vv on resize event
 vv _id different for upsert
 vv open folder need to clean innerHTML
+vv fix { enter } keys
+vv path Route
+vv open folder command
+vv make removed editor null
+vv width height whole number 
+vv get file absolute path for saving file
+vv gqtest need send bug to user
+----
+vv pop alert for save file
+vv basic auth and user id
+vv remember theme
+vv app.get block
+vv app.post block
+vv draggable is stopping resizing on softkeyboard
+----
+vv open / close script block
+show / hide all editors button
+show / hide canvas background
+vv add script 
+create new script block
+discard script block
+add if block
+add loop block
+add start block
+add end block
+vv file page in editor content
+code bucket function as file page in editorcontent
+----    
+refresh file
+refresh folder
+collapse dropzone
+
+
+make db clean
+export editor content button
+import editor content button
+remember scroll position on editors
+zindex reorder on focus
+    / as a command prompt
+
+open db button
+add file button
+add folder button
+vv save as button
+continous save file
+clean saveEditorContent
+external script block
+form block
+reset file
+recent file
 task manager 
 
-
-vv open folder command
-
 edited color Change
-zindex reorder on focus
-vv make removed editor null
-/ as a command prompt
 title bar
 status bar
 toolbar
@@ -74,21 +103,11 @@ open ssh folder
 runner.js
 tester.js
 group block for collapse groups
-vv get file absolute path for saving file
 notes button
 code repo
 pastebin integration
 encapsule block
-vv make db clean 
 zen mode / fullscreen
 maineditor attribute
 mouse cursor 
-vv width height whole number 
 
-vv gqtest need send bug to user
-
-add script block
-add if block
-add loop block
-add start block
-add end block

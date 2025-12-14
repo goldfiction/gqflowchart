@@ -3,6 +3,7 @@
 const https = require('https');
 const express = require('express');
 const bodyParser = require('body-parser');
+const basicAuth = require('express-basic-auth');
 const multer = require('multer');
 
 var Datastore = require('nedb')
@@ -26,6 +27,11 @@ const path = require('path');
 const { exec } = require('child_process');
 const app = express();
 
+app.use(basicAuth({
+    users: { admin: 'admin' },
+    challenge: true // <--- needed to actually show the login dialog!
+}));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public/www')); 
@@ -42,7 +48,7 @@ function execCmd(command,cb){
             cb("Command produced standard error: "+stderr)
             return;
         }
-        cb(null,"Command output (stdout):\n"+stdout)
+        cb(null,stdout)
         console.log(`Command output (stdout):\n${stdout}`);
     });
 }
@@ -92,10 +98,9 @@ app.post('/write', (req, res) => {
 });
 
 app.post('/geteditorcontent', (req, res) => {
-    db.find({id:1}, function (err, docs) {   // Callback is optional
+    db.find({id:req.auth.user}, function (err, docs) {   // Callback is optional
         if (docs.length >= 1) {
             res.status(200).send(docs[0].content);
-            
         } else {
             res.status(400).send("failed to find document")
         }
@@ -106,9 +111,9 @@ app.post('/editorcontent', (req, res) => {
     if (!req.body.content) {
         return res.status(400).send('No file content.');
     }
-    db.update({ id: 1 }, { $set: { content: req.body.content } }, { upsert: true }, function (err, numReplaced, upsert) {
+    db.update({ id: req.auth.user }, { $set: { content: req.body.content } }, { upsert: true }, function (err, numReplaced, upsert) {
         res.status(200).send("OK");
-        console.log("editorcontent saved!")
+        //console.log("editorcontent saved!")
     });
 })
 
@@ -133,7 +138,7 @@ app.post('/folder', (req, res) => {
     }
 })
 
-app.post('path', (req, res) => { 
+app.post('/path', (req, res) => { 
     req.body.path = path.normalize(req.body.path)
     realpath = fs.realpathSync(req.body.path + "/" + (req.body.file || ""))
     res.send(realpath)
@@ -147,6 +152,11 @@ app.post('/cmd', (req, res) => {
         else
             res.send(r);
     })    
+})
+
+app.get('/user', (req,res) => { 
+    console.log(req.auth.user);
+    res.send(req.auth.user);
 })
 
 app.get('/hello', (req, res) => {

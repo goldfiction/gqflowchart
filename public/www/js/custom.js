@@ -207,23 +207,30 @@ function downloadForm() {
     });
 }
 
-function saveFile(id) {
-    try {
-        file = JSON.parse(localStorage.getItem("editorContent")).editor[id].file
-        content = ace.edit("editor"+id).getValue() 
-        $.ajax({
-            type: "POST",
-            url: "/write",
-            data: { file: file, content: content },
-            success: function (data, status, XHR) {
-                //alert("File saved: "+file)
-                console.log("File saved: " + file)
-            },
-            dataType: "text"
-        });
+function saveFile(id, file) {
+    if (editorContent.editor[id].type == "script") {
+        var editor=ace.edit("editor"+id)
+        editorContent.editor[id].script = btoa(editor.getValue())
+        saveEditorContent()
+    } else {
+        try {
+            file = file || JSON.parse(localStorage.getItem("editorContent")).editor[id].file
+            content = ace.edit("editor" + id).getValue()
+            $.ajax({
+                type: "POST",
+                url: "/write",
+                data: { file: file, content: content },
+                success: function (data, status, XHR) {
+                    //alert("File saved: "+file)
+                    console.log("File saved: " + file);
+                    showalert("File saved: " + file);
+                },
+                dataType: "text"
+            });
         
-    } catch (e) { 
-        console.log(e)
+        } catch (e) {
+            console.log(e)
+        }
     }
 }
 
@@ -278,10 +285,13 @@ function saveEditorContent(){
     });
 }
 
+timeoutHandler = null;
+
 function neweditor(id) {
     elem = $("<div id='e" + id + "' class='ediv posabs'>").html($("#etemplate").html())
     $("#start").after(elem)
     $("#e" + id + " .editor").attr("id", "editor" + id);
+    $("#e" + id + " .editor").removeClass("ace-monokai");
     $("#e" + id + " .editorcursor").mousedown(function (e) {
         handle_mousedown($("#e" + id + " .editorcursor"), e, function () {
             var ui=syncButtons(id)
@@ -335,17 +345,22 @@ function neweditor(id) {
     myResizableDiv = document.getElementById('myResizableDiv');
     */
     myResizableDiv = $("#e" + id + " .editor")[0]
+
     resizeObserver = new ResizeObserver(entries => {
         for (let entry of entries) {
-            // console.log(`Div resized! New dimensions: ${width}px x ${height}px`);
-            // Perform actions based on the new dimensions, e.g., update other elements, recalculate layouts.
             try {
                 const { width, height } = entry.contentRect;
-                width = Math.floor(width)
-                height = Math.floor(height)
-                editorContent.editor[id].size = { width: width, height: height };
-                saveEditorContent()                
-            }catch(e){}
+                //console.log(`Div resized! New dimensions: ${width}px x ${height}px`);
+                var re_w = Math.floor(width)
+                var re_h = Math.floor(height)
+                editorContent.editor[id].size = { width: re_w, height: re_h };
+                try { 
+                    clearTimeout(timeoutHandler)
+                    timeoutHandler = setTimeout(saveEditorContent, 500)
+                } catch (e) { }
+            } catch (e) {
+                console.log(e)
+            }
         }
     });
 
@@ -353,8 +368,16 @@ function neweditor(id) {
 
 
     var editor = ace.edit("editor" + id);
-    editor.setTheme("ace/theme/monokai"); // Example theme
-    editor.session.setMode("ace/mode/javascript"); // Example mode
+    var themeOption = "ace/theme/monokai";
+    try { 
+        themeOption = editorContent.editor[id].theme;
+    } catch (e) { }
+    if (themeOption == undefined) {
+        themeOption = "ace/theme/monokai";      
+    }
+    console.log(themeOption)
+    editor.setTheme(themeOption); // Example theme
+    editor.session.setMode("/ace/mode/javascript"); // Example mode
     editor.getSession().setValue('');
     editor.editorID = id;
 
@@ -477,7 +500,7 @@ function scrollable() {
         // Adjust scroll position based on wheel delta
         scrollableDiv.scrollTop += event.deltaY;
         // For horizontal scrolling: scrollableDiv.scrollLeft += event.deltaX;
-    });
+    },{ passive: true });
 }
 
 function onChange(input) {
@@ -526,8 +549,22 @@ function insertCharToEditor(editorId,char) {
     // Define the character you want to insert
     var characterToInsert = char; // Or any other character
 
-    // Insert the character at the cursor position
-    editor.session.insert(cursorPosition, characterToInsert);
+    if (characterToInsert == "{enter}") {
+        characterToInsert = '\r'
+        editor.session.insert(cursorPosition, characterToInsert);
+    } else if (characterToInsert == "{tab}") {
+        characterToInsert = '\t'
+        editor.session.insert(cursorPosition, characterToInsert);
+    } else if (characterToInsert == "{space}") {
+        characterToInsert = ' '
+        editor.session.insert(cursorPosition, characterToInsert);
+    } else if (characterToInsert == "{bksp}") {
+        //characterToInsert = String.fromCharCode(8)
+        editor.execCommand("backspace")
+    } else { 
+        //console.log("unhandled key: " + characterToInsert)
+        editor.session.insert(cursorPosition, characterToInsert);
+    }
 }
 
 function onresize() { 
@@ -551,16 +588,17 @@ function attachVoiceRecognition() {
 }
 
 function attachControlKey(id) {
+    chromeErrorHandler2()
     var editor = ace.edit("editor" + id);
     var currentFontSize = editor.getFontSize()
-    $("#editor"+id).keydown(function (event) {
+    $("#editor" + id).keydown(function (event) {
         // Check if Ctrl key is pressed and the key is 'c' or 'C'
         if (event.ctrlKey && (event.key === '=' || event.key === '+')) {
             event.preventDefault(); // Prevent the default copy action if needed
             console.log("Ctrl++ was pressed!");
             currentFontSize++
             editor.setOptions({
-                fontSize: currentFontSize+"px"
+                fontSize: currentFontSize + "px"
             });
         } else if (event.ctrlKey && (event.key === '-' || event.key === '_')) {
             event.preventDefault(); // Prevent the default copy action if needed
@@ -573,6 +611,7 @@ function attachControlKey(id) {
             event.preventDefault(); // Prevent the default copy action if needed
             console.log("Ctrl+s was pressed!");
             saveFile(id)
+        } else if (event.ctrlKey) { 
         }
     });
 }
@@ -586,20 +625,207 @@ function addThemes(id) {
         data: { path: "./public/www/ace/css/theme" },
         success: function (data, status, XHR) {
             themes = JSON.parse(data)
-            console.log(themes)
+            //console.log(themes)
             themes.forEach((theme) => {
                 var item=theme.file.split('.')[0]
                 var $newOption = $('<option>').val(item).text(item);
                 $selectBox.append($newOption);                
             })
             $selectBox.on("change", function (e) {
+                var editor = ace.edit("editor" + id);
                 var selectedTheme = $(this).val(); // Get the selected value from the dropdown
-                editor.setTheme("ace/theme/" + selectedTheme);
+                editorContent.editor[id].theme = "ace/theme/" + selectedTheme;
+                editor.setTheme(editorContent.editor[id].theme);
+                //editor.getSession().setMode('ace/mode/javascript');
+                console.log("try to set theme for id " + id + " to " + editorContent.editor[id].theme)
+                showalert("Set theme to " + editorContent.editor[id].theme)
+                saveEditorContent();
             })
         },
         dataType: "text"
     });
 } 
+
+function post(o,cb) { 
+    $.ajax({
+        type: "POST",
+        url: o.url,
+        data: o.data,
+        success: function (data, status, XHR) {
+            cb(null,data)
+        },
+        error: function (e) { 
+            cb(e);
+        },
+        dataType: "text"
+    });
+}
+
+function get(o, cb) {
+    $.ajax({
+        type: "GET",
+        url: o.url,
+        data: o.data,
+        success: function (data, status, XHR) {
+            cb(null, data)
+        },
+        error: function (e) {
+            cb(e);
+        },
+        dataType: "text"
+    });
+}
+
+
+function chromeErrorHandler() { 
+    try {
+        chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+            chrome.storage.local.set({ foo: 'bar' }, () => {
+                sendResponse('dont');
+            });
+            return true;
+        });
+    } catch (e) { }
+}
+
+function chromeErrorHandler2() { 
+    try { 
+        chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+            sendResponse();  // if you uncomment this line, error will disappear...
+            return true; // if you uncomment this line, error will also disappear (indicates async callback)
+        });
+    } catch (e) { }
+}
+
+function showalert(text){
+    $("#alertpopout").text(text)
+    $("#alertpopout").fadeIn()
+    setTimeout(function(){
+        $("#alertpopout").fadeOut()
+    },15000)
+}
+
+function addScriptBlock() { 
+    // Define the style for the icon
+    var group = new PIXI.Container();
+    group.position.set(400, 400);
+
+
+    const background = new PIXI.Graphics();
+
+    // Define the dimensions and color
+    const groupWidth = 130;
+    const groupHeight = 40;
+    const bgColor = 0x2c3e50; // A dark blue-gray color
+
+    // Draw the background rectangle
+    background.rect(-10, -10, groupWidth, groupHeight).fill(bgColor);
+    group.addChild(background);
+
+    const iconStyle = new PIXI.TextStyle({
+        fontFamily: 'Font Awesome 6 Free', // Use the correct font family name (check your FA version's CSS)
+        fontSize: 20,
+        fill: '#ffffff', // Set the color
+        fontWeight: '900' // Font Awesome icons often require a specific font weight (e.g., 900 for solid)
+    });
+
+    // Create the text object using the icon's unicode (e.g., \uf003 is the envelope icon)
+    const envelopeIcon = new PIXI.Text('\uf126', iconStyle);
+
+    // Position and add the icon to your Pixi.js stage/container
+    envelopeIcon.x = 0;
+    envelopeIcon.y = 0;
+    
+    group.addChild(envelopeIcon);
+
+    const style = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 16,
+        fill: '#ffffff', // White color
+        wordWrap: true,
+        wordWrapWidth: 440,
+        align: 'center'
+    });
+
+    // 3. Create the text object
+    const basicText = new PIXI.Text({
+        text: 'Script Block',
+        style: style
+    });
+
+    // 4. Position the text (like any other display object)
+    basicText.x = 25;
+    basicText.y = 0;
+
+    // 5. Add the text to the stage to make it visible
+    group.addChild(basicText);
+    // 3. Enable interactivity
+
+    group.interactive = true;
+    // Optional: change cursor to a hand pointer on hover
+    group.cursor = 'pointer'; 
+    var dragging = false;
+    var data = null;
+
+    // 4. Setup event listeners
+    group.eventMode = 'static';
+    group.addEventListener('click', (e) => {
+        if (e.detail === 2) {
+            console.log('group double-clicked!');
+            // Perform your desired actions here
+            try { 
+                id = editorContent.script[0].id;
+            }
+            catch (e) { 
+                id = ++editorIDCount;
+            }
+            
+            var editor = neweditor(id);
+            editorContent.editor[id].type = "script";
+            try {
+                editor.setValue(atob(editorContent.editor[id].script))
+            } catch (e) { }
+            if (editorContent.script == undefined) {
+                editorContent.script = []
+                editorContent.script[0] = {}
+            }
+            editorContent.script[0].id=id
+            saveEditorContent();
+            //console.log(editor.id)
+        }
+    });
+
+    group
+        .on('pointerdown', onDragStart)
+        .on('pointerup', onDragEnd)
+        .on('pointerupoutside', onDragEnd)
+        .on('pointermove', onDragMove);
+    app.stage.addChild(group);
+
+    function onDragStart(event) {
+        // Store a reference to the pointer data for multitouch support
+        data = event.data;
+        this.alpha = 0.5; // Visual cue that the element is being dragged
+        dragging = true;
+    }
+
+    function onDragEnd() {
+        this.alpha = 1; // Reset transparency
+        dragging = false;
+        // Set the interaction data to null
+        data = null;
+    }
+
+    function onDragMove() {
+        if (dragging) {
+            // Get the new global position of the pointer
+            const newPosition = data.getLocalPosition(this.parent);
+            // Update the element's position
+            this.x = newPosition.x-10;
+            this.y = newPosition.y-10;
+        }
+    }
+}
 
 $(document).ready(async function () {
     await getEditorContent()
@@ -650,11 +876,16 @@ $(document).ready(async function () {
     myKeyboard = new Keyboard({
         onChange: input => onChange(input),
         onKeyPress: button => onKeyPress(button),
-        theme: "hg-theme-default hg-layout-default myTheme1"
+        theme: "hg-theme-default hg-layout-default myTheme1",
+        newLineOnEnter: true,
+        tabCharOnTab: true
     });
 
-    $(".keyboard-wrapper").mousedown(function (e) {
+    // this handles draggable
+    // TODO: currently this is preventing resizing
+    $(".keyboardcursor").mousedown(function (e) {
         handle_mousedown($(".keyboard-wrapper"), e, function () {
+            //console.log(e)
         })
     });
 
@@ -696,4 +927,6 @@ $(document).ready(async function () {
         // - Triggering other functions or events
         onresize();
     });
+    //chromeErrorHandler2()
+    addScriptBlock()
  });

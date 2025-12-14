@@ -9,6 +9,7 @@
   "dependencies": {
     "express":"4.0.0",
     "body-parser": "*",
+    "express-basic-auth": "",
     "nedb":"",
     "gqlodash":"",
     "pug":"",

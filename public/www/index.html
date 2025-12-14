@@ -24,7 +24,7 @@
         <link rel="stylesheet" href="/css/bootstrap.min.css">
     </head>
 <body>
-    <div class="filegroup">
+    <div class="filegroup resizable-div" >
         <div class="filetree">
             <ul class="main-tree">
             </ul>
@@ -66,7 +66,7 @@
         </div>
         
         <div id="themeform" class="themeform posabs" style="display:none; z-index:1000;">
-            <form>
+            <form id="themeformform">
                 <label for="theme-select">Choose a theme:</label>
                 <select id="theme-select" class="theme-select" name="themeOptioon">
                 </select>
@@ -103,11 +103,8 @@
             </button>
         </div>
 
-
-
-
     </div>
-    <div id="terminalgroup" class="divgroup resizable-div scrollable-div">
+    <div id="terminalgroup" class="divgroup scrollable-div resizable-div"  style="height:100px;width:800px;">
         <div id="my-terminal"></div>
     </div>
     <div id="dropgroup" class="divgroup resizable-div">
@@ -130,10 +127,19 @@
         </div>
     </div>
 
-    <div class="keyboard-wrapper resizable-div">
+    <div class="keyboard-wrapper resizable-div nooverflow">
+        <div id="keyboardcursor" class="keyboardcursor editorbutton fullimage" title="Move">
+            <button type="button" aria-label="Move">
+                <i class="fa-solid fa-grip-vertical"></i>
+            </button>
+        </div>
+
         <div class="simple-keyboard"></div>
     </div>
 
+    <div id="alertpopout" class="alert alert-success posabs" role="alert">
+        This is a success alert—check it out!
+    </div>
     <!--
     <div class="filegroup">
         <div class="filetree">
@@ -173,4 +179,4 @@
         <script src="/js/speech.js"></script>
         <script src="/js/custom.js"></script>
 </body>
-</html>
+</html> 
