@@ -8,5 +8,4 @@ app.init({
 }).then(async () => {
     // Append the application's canvas to the document body
     document.body.appendChild(app.canvas);
-
 });

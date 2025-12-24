@@ -72,7 +72,7 @@ function updateFolder(data, path) {
     //console.log(data)
     
     $('.main-tree').empty()
-    $('.main-tree').append("<li class=\"tree-title\">" + compactPath(path) + "</li><ul class=\"tree folder-item\" path=\"" + path + "/../" +"\"></ul>");
+    $('.main-tree').append("<li class=\"tree-title roottree\">" + compactPath(path) + "</li><ul class=\"tree folder-item\" path=\"" + path + "/../" +"\"></ul>");
     elem = $('.main-tree ul').append("<li class=\"tree-title\">..</li>")
     data.forEach((file) => {
         if (file.type == "folder")
@@ -93,6 +93,9 @@ function updateFolder(data, path) {
     })
     resetTree()
     $('body').find('.tree').fadeIn(0);
+    $('.roottree').click(function (elem) { 
+        openFolder(path);
+    })
 }
 
 function reopenEditor() {
@@ -314,11 +317,30 @@ function neweditor(id) {
     })
     $("#e" + id + " .editorsaveas").click(function () {
         console.log("try to save as tab id: " + id)
-        //saveFile(id)
+        //TODO: try to save as file here
+        //path = command.split(' ').slice(1).join(' ')
+        //saveFile(id,path)
+        $(".inputBoxInnerDiv input").val(editorContent.editor[id].file);
+        $(".inputBoxDiv1").fadeIn()
+        $(".inputBoxInnerDiv .submitbtn").click(function (e) { 
+            e.preventDefault()
+            path=$(".inputBoxInnerDiv input").val()
+            saveFile(id, path)
+            $(".inputBoxDiv1").fadeOut();
+        })
+        $(".inputBoxInnerDiv .closebtn").click(function (e) { 
+            e.preventDefault()
+            $(".inputBoxDiv1").fadeOut();
+        })
+
     })
     $("#e" + id + " .editorsavecontinous").click(function () {
         console.log("try to save continously on tab: " + id)
-        //saveFile(id)
+        toggleSaveContinuous(id)
+    })
+    $(".reseteditors").click(function () {
+        console.log("try to reset all editors")
+        resetAllEditors()
     })
     var showThemeForm=false
     $("#e" + id + " .selecttheme").click(function () {
@@ -567,23 +589,30 @@ function insertCharToEditor(editorId,char) {
     }
 }
 
-function onresize() { 
-    $("#editorplus").css({ top: ($(window).height() - 30), left: 10 })
+function onresize() {
+  /*    $("#editorplus").css({ top: ($(window).height() - 30), left: 10 })
     $("#fileSelector").css({ top: ($(window).height() - 30), left: 100 })
     $("#voiceInput").css({ top: ($(window).height() - 30), left: 200 })
     $("#togglesoftkeyboard").css({ top: ($(window).height() - 30), left: 300 })
     $("#savelayout").css({ top: ($(window).height() - 30), left: 400 })
-
+    $("#hideeditors").css({ top: ($(window).height() - 30), left: 500 })
+    $("#hidecanvas").css({ top: $(window).height() - 30, left: 600 });
     $(".keyboard-wrapper").css({ top: ($(window).height() - 320) })
+*/
 }
 
 function attachVoiceRecognition() { 
-    $('#startVoiceInput').on('click', function () {
-        recognition.start(); // Start the speech recognition
-    });
-
-    $('#stopVoiceInput').on('click', function () {
-        recognition.stop(); // Stop the speech recognition
+    var isVoiceInput = false;
+    $('#voiceInput').on('click', function () {
+        if (isVoiceInput) {
+            $(".voiceInput").removeClass("active")
+            recognition.stop(); // Stop the speech recognition
+            isVoiceInput=false;
+        } else {
+            $(".voiceInput").addClass("active")
+            recognition.start(); // Start the speech recognition        
+            isVoiceInput=true;
+        }
     });
 }
 
@@ -611,6 +640,16 @@ function attachControlKey(id) {
             event.preventDefault(); // Prevent the default copy action if needed
             console.log("Ctrl+s was pressed!");
             saveFile(id)
+        } else if (event.ctrlKey && (event.key === 'r' || event.key === 'R')) {
+            event.preventDefault();
+            console.log("Ctrl+r was pressed!");
+            console.log("id is: "+id)
+            resetEditorPosition(id)
+        } else if (event.altKey && event.key === "Enter") {
+            event.preventDefault();
+            console.log("Alt+Enter was pressed!");
+            console.log("id is: " + id)
+            toggleFullScreen(id)
         } else if (event.ctrlKey) { 
         }
     });
@@ -703,6 +742,59 @@ function showalert(text){
     setTimeout(function(){
         $("#alertpopout").fadeOut()
     },15000)
+}
+
+function maxEditorPosition(id) { 
+    $('#editor'+id).addClass("ace_fullscreen")
+    syncButtons(id);
+}
+
+function resetEditorPosition(id) { 
+    try { 
+        $("#editor" + id).removeClass("ace_fullscreen");
+    } catch (e) { }
+    $("#e" + id+" .editorcursor").css({
+        top: "200px",
+        left: "200px",
+    })
+    $("#editor" + id).css({
+      height: "200px",
+      width: "200px",
+    });
+    var ui=syncButtons(id)
+    editorContent.editor[id].offset = ui.offset();
+    saveEditorContent()
+}
+
+function toggleFullScreen(id) {
+    if ($("#editor" + id).hasClass("ace_fullscreen")) {
+        resetEditorPosition(id)
+    } else { 
+        maxEditorPosition(id)
+    }
+}
+
+function toggleSaveContinuous(id) { 
+    var saveeditorhandler = null;
+    if ($("#e" + id + " .editorsavecontinous").hasClass("activebutton")) {
+        $("#e" + id + " .editorsavecontinous").removeClass("activebutton")
+        clearTimeout(saveeditorhandler)
+    } else {
+        $("#e" + id + " .editorsavecontinous").addClass("activebutton")
+        saveeditorhandler = setTimeout(function () { 
+            saveFile(id)
+        },900000)
+    }
+}
+
+function resetAllEditors() { 
+    editorContent.editor.forEach((editor, index, array) => { 
+        if (editor != null) {
+            if (editor.enabled) { 
+                resetEditorPosition(index)
+            }            
+        }
+    })
 }
 
 function addScriptBlock() { 
@@ -825,6 +917,35 @@ function addScriptBlock() {
             this.y = newPosition.y-10;
         }
     }
+
+    group.visible = false;
+    
+    const sprite = new PIXI.Sprite(PIXI.texture);
+    sprite.eventMode = 'static'; // Make the sprite interactive
+    sprite.cursor = 'url("/images/cursor.cur"), auto'; // Set a custom cursor with a fallback
+    app.stage.addChild(sprite);
+    
+}
+
+function attachXterm(){
+    var term = new Terminal();
+    var webSocket = new WebSocket("wss://"+window.location.host); // Replace with your WebSocket endpoint
+    webSocket.binaryType = 'arraybuffer';
+    
+    // Handle any other events (e.g., terminal resizing, socket closing)
+    webSocket.addEventListener('close', () => {
+        console.log('WebSocket connection closed');
+    });
+
+    webSocket.addEventListener('error', (error) => {
+        console.error('WebSocket error:', error);
+    });
+
+    var attachAddon = new AttachAddon.AttachAddon(webSocket);
+    term.loadAddon(attachAddon);
+    term.open(document.getElementById('xterm-terminal'));
+    //term.write('Hello from \x1B[1;3;31mxterm.js\x1B[0m $ ')
+    //term.focus();
 }
 
 $(document).ready(async function () {
@@ -882,7 +1003,7 @@ $(document).ready(async function () {
     });
 
     // this handles draggable
-    // TODO: currently this is preventing resizing
+    // XTODO: currently this is preventing resizing
     $(".keyboardcursor").mousedown(function (e) {
         handle_mousedown($(".keyboard-wrapper"), e, function () {
             //console.log(e)
@@ -894,17 +1015,47 @@ $(document).ready(async function () {
     $('#togglesoftkeyboard').on('click', function () {
         if (showkeyboard) {
             showkeyboard = false
+            $(".togglesoftkeyboard").removeClass("active");
             $(".keyboard-wrapper").fadeOut()
         } else {
             showkeyboard = true
+            $(".togglesoftkeyboard").addClass("active");
             $(".keyboard-wrapper").fadeIn()           
         }
     });
+
+    $(".keyboard-wrapper").css({ left: "20%", top: "60%" });
 
     $("#savelayout button").on("click", function () {
         console.log("layout saved!")
         saveEditorContent()
     })
+
+    var hideeditors = false;
+    $("#hideeditors").on("click", function () {
+      if (!hideeditors) {
+        hideeditors = true;
+        $(".ediv").fadeOut();
+        $("#hideeditors").addClass("active");
+      } else {
+        hideeditors = false;
+        $(".ediv").fadeIn();
+        $("#hideeditors").removeClass("active");
+      }
+    });
+
+    var hidecanvas = false;
+    $("#hidecanvas").on("click", function () {
+      if (!hidecanvas) {
+        hidecanvas = true;
+        $("body canvas").fadeOut();
+        $("#hidecanvas").addClass("active");
+      } else {
+        hidecanvas = false;
+        $("body canvas").fadeIn();
+        $("#hidecanvas").removeClass("active");
+      }
+    });
 
     reopenEditor()
     scrollable()
@@ -929,4 +1080,6 @@ $(document).ready(async function () {
     });
     //chromeErrorHandler2()
     addScriptBlock()
+    attachXterm()
+    $(".inputBoxDiv1").fadeOut();
  });

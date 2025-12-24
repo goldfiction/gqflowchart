@@ -1,14 +1,18 @@
 //index.js
 
+const http = require('http');
 const https = require('https');
 const express = require('express');
 const bodyParser = require('body-parser');
 const basicAuth = require('express-basic-auth');
 const multer = require('multer');
+const WebSocket = require('ws');
+const pty = require('node-pty');
 
 var Datastore = require('nedb')
     , db = new Datastore({ filename: '~/.gqflow/nedb.json', autoload: true });
-db.ensureIndex({ fieldName: 'id', unique: true });
+console.log("nedb loaded...")
+//db.ensureIndex({ fieldName: 'id', unique: true });
 
 var gqfs = require('gqfs');
 gqfs = gqfs.gqfs;
@@ -163,9 +167,46 @@ app.get('/hello', (req, res) => {
     res.send('Hello from our server!')
 })
 
-app.listen(80, () => {
+server = http.createServer(app);
+sslserver = https.createServer(options, app);
+
+wss = new WebSocket.Server({server:sslserver});
+
+wss.on('connection', (ws) => {
+    // Spawn a new PTY process for each client connection
+    const ptyProcess = pty.spawn('bash', [], { // Use 'cmd.exe' on Windows
+        name: 'xterm-color',
+        cols: 80,
+        rows: 24,
+        cwd: process.env.HOME,
+        env: process.env
+    });
+
+    console.log(`Client connected. PID: ${ptyProcess.pid}`);
+
+    // Listen for data from the PTY process and send it to the client over WebSocket
+    ptyProcess.on('data', function (data) {
+        ws.send(data);
+    });
+
+    // Listen for messages from the client (user input) and write it to the PTY process
+    ws.on('message', (message) => {
+        ptyProcess.write(message);
+    });
+
+    // Handle connection closure
+    ws.on('close', () => {
+        ptyProcess.kill(); // Kill the PTY process when the client disconnects
+        console.log(`Client disconnected. Killed PID: ${ptyProcess.pid}`);
+    });
+});
+
+console.log('wss listening on port 443')   
+
+server.listen(80, () => {
     console.log('server listening on port 80')
-    https.createServer(options, app).listen(443, () => { 
-        console.log('ssl server listening on port 443')
-    })
+})
+
+sslserver.listen(443,() => { 
+    console.log('ssl server listening on port 443')
 })

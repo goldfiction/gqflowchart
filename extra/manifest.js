@@ -55,39 +55,36 @@ vv app.get block
 vv app.post block
 vv draggable is stopping resizing on softkeyboard
 ----
+vv real ssh terminal
+vv web socket
+vv node-pty
+vv realssh for gqflowchart
 vv open / close script block
-show / hide all editors button
-show / hide canvas background
+----
+tryout pixigraph flowchart
+tryout graphology flowchart
 vv add script 
-create new script block
-discard script block
+discard script block button
 add if block
 add loop block
 add start block
 add end block
+form block
 vv file page in editor content
-code bucket function as file page in editorcontent
+vv code bucket function as file page in editorcontent
 ----    
 refresh file
-refresh folder
 collapse dropzone
+vv collspse terminal
+error in browser debug and solve
 
 
-make db clean
+vv make db clean
 export editor content button
 import editor content button
-remember scroll position on editors
-zindex reorder on focus
-    / as a command prompt
 
-open db button
-add file button
-add folder button
 vv save as button
-continous save file
-clean saveEditorContent
-external script block
-form block
+vv clean saveEditorContent
 reset file
 recent file
 task manager 
@@ -107,7 +104,36 @@ notes button
 code repo
 pastebin integration
 encapsule block
-zen mode / fullscreen
-maineditor attribute
-mouse cursor 
 
+vv reset view for editor ^r
+vv zen mode / fullscreen
+vv mouse cursor 
+
+--->>
+vv *show / hide all editors button
+vv *reset all editors button
+vv *show / hide canvas background
+vv * saveas button
+vv * save continuous
+vv * refresh folder
+vv * active status color to buttons
+vv active status for softkeyboard
+vv active status for voiceinput
+vv active status for hide editors
+vv active status for hide canvas
+---
+
+clean console.log
+open db button
+continous save file
+external script block
+__add file button
+__add folder button
+clean post and get
+refactor code
+create new script block
+maineditor attribute
+remember scroll position on editors
+zindex reorder on focus
+/ as a command prompt
+investigate how to use pixi to draw flowcharts

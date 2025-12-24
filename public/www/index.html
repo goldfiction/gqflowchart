@@ -22,6 +22,10 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.34.0/css/jquery.terminal.css" />
 
         <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+        <link rel="stylesheet" href="/css/xterm.css" />
+        <script src="/js/xterm.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-attach@0.11.0/lib/addon-attach.min.js"></script>
     </head>
 <body>
     <div class="filegroup resizable-div" >
@@ -74,38 +78,57 @@
         </div>
 
     </div>
-    <div>
-        <div id="fileSelector" class="editorplus bottombutton posabs" title="Select File">
+    <div class="buttomButtonDiv posabs">
+        <div id="fileSelector" class="editorplus bottombutton" title="Select File">
             <input type="file" id="fileInput" class="displaynone">
-            <button id="selectFileButton">Select File</button>
+            <button id="selectFileButton"> Select File</button>
         </div>        
 
-        <div id="editorplus" class="editorplus bottombutton posabs" title="New Editor">
+        <div id="editorplus" class="editorplus bottombutton" title="New Editor">
             <button type="button" aria-label="New Editor">
-                <i class="fa fa-plus">editor</i>
+                <i class="fa fa-plus"> editor</i>
             </button>
         </div>
 
-        <div id="voiceInput" class="voiceInput bottombutton posabs">
-            <div id="startVoiceInput">Start Voice Input</div>
-            <div id="stopVoiceInput">Stop Voice Input</div>
+        <div id="voiceInput" class="voiceInput bottombutton" title="Voice Input">
+            <button type="button" aria-label="voiceInput">
+                <i class="fa fa-record-vinyl"> VoiceInput</i>
+            </button>
         </div>
 
-        <div id="togglesoftkeyboard" class="togglesoftkeyboard bottombutton posabs" title="Soft Keyboard">
+        <div id="togglesoftkeyboard" class="togglesoftkeyboard bottombutton" title="Soft Keyboard">
             <button type="button" aria-label="Soft Keyboard">
-                <i class="fa fa-keyboard-o">Soft Keyboards</i>
+                <i class="fa fa-keyboard-o"> Soft Keyboards</i>
             </button>
         </div>
         
-        <div id="savelayout" class="savelayout bottombutton posabs" title="Save Layout">
+        <div id="savelayout" class="savelayout bottombutton" title="Save Layout">
             <button type="button" aria-label="Save Layout">
-                <i class="fa fa-save">Save Layout</i>
+                <i class="fa fa-save"> Save Layout</i>
             </button>
         </div>
 
+        <div id="hideeditors" class="hideeditors bottombutton" title="Hide Editors">
+            <button type="button" aria-label="Hide Editors">
+                <i class="fa fa-close"> Hide Editors</i>
+            </button>
+        </div>
+
+        <div id="hidecanvas" class="hidecanvas bottombutton" title="Hide Canvas">
+            <button type="button" aria-label="Hide Canvas">
+                <i class="fa fa-close"> Hide Canvas</i>
+            </button>
+        </div>
+
+        <div id="reseteditors" class="reseteditors bottombutton" title="Reset All Editors">
+            <button type="button" aria-label="Reset All Editors">
+                <i class="fa fa-close"> Reset All Editors</i>
+            </button>
+        </div>
     </div>
     <div id="terminalgroup" class="divgroup scrollable-div resizable-div"  style="height:100px;width:800px;">
         <div id="my-terminal"></div>
+        <div id="xterm-terminal"></div>
     </div>
     <div id="dropgroup" class="divgroup resizable-div">
         <div id="dropzone">
@@ -135,6 +158,17 @@
         </div>
 
         <div class="simple-keyboard"></div>
+    </div>
+
+    <div id="inputBoxDiv1" class="inputBoxDiv1 posabs">
+        <form>
+            <div class="inputBoxInnerDiv">
+                <label for="inputBox1" class="form-label">Input:</label>
+                <input type="text" class="form-control" id="inputBox1" aria-describedby="InputHelp">
+                <button type="close" class="btn closebtn">Close</button>
+                <button type="submit" class="btn btn-primary submitbtn">Submit</button>
+            </div>
+        </form>
     </div>
 
     <div id="alertpopout" class="alert alert-success posabs" role="alert">

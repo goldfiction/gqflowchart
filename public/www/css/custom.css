@@ -13,6 +13,7 @@
 body {
     margin: 0;
     overflow: hidden;
+    background-color: #272822!important;
 }
 
 .resizable-div {
@@ -41,18 +42,20 @@ body {
     object-fit: contain;
 }
 
+/*
 #fileSelector{
 
     width: 90px;
     height: 12px;
     font-size: 6;
 }
+*/
 
 .bottonbutton,
 .bottombutton button,
 .bottombutton div{
-    padding: 0;
-    margin: 0;
+    padding: 2px;
+    margin: 2px;
     font-size: 8px;
     font-style: none;
     font-weight: none;
@@ -64,6 +67,20 @@ body {
     background-color: #888;
 }
 
+.bottombutton div:active,
+.bottombutton button:active,
+.bottombutton.active button,
+.bottombutton.active div{
+    background-color: #9F9;
+}
+
+.buttomButtonDiv{
+    bottom:5px;
+    display: flex;
+    justify-content: space-around;
+    gap: 0px;
+}
+
 #editorcursor{
     background-color: #555;
     width: 12px;
@@ -73,9 +90,16 @@ body {
 }
 
 .editorbutton :hover{
-        background-color: #999;
-        height:24px;
-        width:24px;
+    background-color: #999;
+    height:24px;
+    width:24px;
+}
+
+.editorbutton :active {
+    background-color: #9F9;
+}
+.editorbutton.activebutton {
+    background-color: #99F;
 }
 
 #editorcursor img{
@@ -241,4 +265,48 @@ div.filegroup:hover {
     font-size:10px;
     /*word-break: break-all;
     overflow-wrap: break-word;*/
+}
+
+body,
+canvas {
+    cursor: url("/images/cursor32.png"), auto;
+}
+
+.ace_fullscreen {
+    position: fixed;
+    /* Use fixed positioning to cover the whole screen */
+    top: 0!important;
+    bottom: 0!important;
+    left: 0!important;
+    right: 0!important;
+    height: 100vh!important;
+    /* Ensure full height of the viewport */
+    width: 100vw!important;
+    /* Ensure full width of the viewport */
+    opacity:1.0;
+    z-index: 10000;
+    /* Ensure it's on top of other content */
+}
+
+.inputBoxDiv1{
+    background-color: #555;
+    top:50%;
+    left:40%;
+    padding: 0;
+    margin: 0;
+}
+.inputBoxDiv1 form{
+    padding: 0;
+    margin: 0;
+}
+.inputBoxDiv1 .inputBoxInnerDiv {
+    display: flex;
+    justify-content: space-around;
+    padding:0;
+    margin:5px;
+}
+
+.btn,
+.form-control{
+    border-radius: 0!important;
 }
