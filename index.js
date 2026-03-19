@@ -8,6 +8,7 @@ const basicAuth = require('express-basic-auth');
 const multer = require('multer');
 const WebSocket = require('ws');
 const pty = require('node-pty');
+var port=3443;
 
 var Datastore = require('nedb')
     , db = new Datastore({ filename: '~/.gqflow/nedb.json', autoload: true });
@@ -38,9 +39,9 @@ app.use(basicAuth({
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static('public/www')); 
+app.use(express.static('public/www'));
 
-function execCmd(command,cb){ 
+function execCmd(command,cb){
     exec(command, (error, stdout, stderr) => {
         if (error) {
             console.error(`Error executing command: ${error.message}`);
@@ -77,7 +78,7 @@ app.post('/upload', upload.single('myFile'), (req, res) => {
     res.send('File uploaded successfully: ' + req.file.filename);
 });
 
-app.post('/download', (req, res) => { 
+app.post('/download', (req, res) => {
     console.log(req.body);
     res.send(gqfs.readFile(req.body.file));
     console.log("Downloaded file: " + req.body.file);
@@ -125,7 +126,7 @@ app.post('/folder', (req, res) => {
     try {
         req.body.path = path.normalize(req.body.path)
         files = gqfs.dir(req.body.path)
-        files.mapLimit(3, function (file, cb) { 
+        files.mapLimit(3, function (file, cb) {
             stats = gqfs.stat(req.body.path + "/" + file)
             realpath = fs.realpathSync(req.body.path + "/" + file)
             if (stats.isFile())
@@ -135,30 +136,30 @@ app.post('/folder', (req, res) => {
             else
                 cb(null, { file: file, type: "other", path: realpath })
         }, function (e,r) {
-            res.send(JSON.stringify(r))                    
+            res.send(JSON.stringify(r))
         })
     } catch (e) {
         res.send("[]")
     }
 })
 
-app.post('/path', (req, res) => { 
+app.post('/path', (req, res) => {
     req.body.path = path.normalize(req.body.path)
     realpath = fs.realpathSync(req.body.path + "/" + (req.body.file || ""))
     res.send(realpath)
 })
 
-app.post('/cmd', (req, res) => { 
+app.post('/cmd', (req, res) => {
     console.log(req.body)
     execCmd(req.body.command, function (e, r) {
         if (e)
             res.status(400).send({ message: e });
         else
             res.send(r);
-    })    
-})
+    });
+});
 
-app.get('/user', (req,res) => { 
+app.get('/user', (req,res) => {
     console.log(req.auth.user);
     res.send(req.auth.user);
 })
@@ -201,12 +202,12 @@ wss.on('connection', (ws) => {
     });
 });
 
-console.log('wss listening on port 443')   
+console.log('wss listening on port '+port);
 
-server.listen(80, () => {
-    console.log('server listening on port 80')
-})
+//server.listen(80, () => {
+//    console.log('server listening on port 80')
+//})
 
-sslserver.listen(443,() => { 
-    console.log('ssl server listening on port 443')
+sslserver.listen(port,() => {
+    console.log('ssl server listening on port '+port)
 })

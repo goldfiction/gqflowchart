@@ -1,6 +1,6 @@
 {
   "name": "gqflowchart",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A tool for helping coding nodejs in flowchart format",
   "repository": "git@github.com:goldfiction/gqflowchart.git",
   "private": false,
@@ -15,27 +15,28 @@
     "gqdoq": "",
     "gqfs": "",
     "gqlodash": "",
+    "mkdirp": "",
     "multer": "",
     "nedb": "",
+    "node-pty": "^1.1.0",
     "pug": "",
     "sjson5": "",
     "ws": "",
-    "mkdirp":""
+    "coffeescript": "2.7.0"
   },
   "devDependencies": {
-    "coffeescript": "2.7.0",
     "gqtest": "latest",
     "nodemon": "3.1.10"
   },
-  "globalDependencies":{
-    "node-pty":""
+  "globalDependencies": {
+    "node-pty": ""
   },
-  "buildDependencies":{
-    "python3":"",
-    "make":"",
-    "g++":"",
-    "build-essential":"",
-    "cmake":""
+  "buildDependencies": {
+    "python3": "",
+    "make": "",
+    "g++": "",
+    "build-essential": "",
+    "cmake": ""
   },
   "scripts": {
     "start": "node --require coffeescript/register index.js",
