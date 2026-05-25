@@ -27,7 +27,7 @@ shell="bash"
 if(os.platform()=="win32"){
   shell="powershell.exe" //#"powershell.exe"
 }
-console.log shell
+console.log(shell)
 
 const options = {
     key: fs.readFileSync('./private/key.pem'),
