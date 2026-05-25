@@ -17,7 +17,7 @@
     "gqlodash": "",
     "mkdirp": "",
     "multer": "",
-    "nedb": "",
+    "nedb": "1.8.0",
     "node-pty": "^1.1.0",
     "pug": "",
     "sjson5": "",

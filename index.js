@@ -175,7 +175,7 @@ wss = new WebSocket.Server({server:sslserver});
 
 wss.on('connection', (ws) => {
     // Spawn a new PTY process for each client connection
-    const ptyProcess = pty.spawn('bash', [], { // Use 'cmd.exe' on Windows
+    const ptyProcess = pty.spawn('cmd.exe', [], { // Use 'cmd.exe' on Windows
         name: 'xterm-color',
         cols: 80,
         rows: 24,
