@@ -25,7 +25,7 @@ var doq=require('gqdoq')
 
 shell="bash"
 if(os.platform()=="win32"){
-  shell="powershell.exe"#"powershell.exe"
+  shell="powershell.exe" //#"powershell.exe"
 }
 console.log shell
 
