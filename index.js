@@ -2,6 +2,7 @@
 
 const http = require('http');
 const https = require('https');
+const os = require('os');
 const express = require('express');
 const bodyParser = require('body-parser');
 const basicAuth = require('express-basic-auth');
