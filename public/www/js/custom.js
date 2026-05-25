@@ -928,7 +928,18 @@ function addScriptBlock() {
 }
 
 function attachXterm(){
-    var term = new Terminal();
+    var term = new Terminal({
+      fontFamily: '"Source Code Pro", "Courier New", monospace',
+      fontSize: 14,
+      encoding: 'utf-8',
+      theme: {
+        background: '#000',
+        foreground: '#ff7000', // Default font color
+        cursor: '#ffffff',
+        black: '#000000',
+        red: '#ff0000'
+      }
+    });
     var webSocket = new WebSocket("wss://"+window.location.host); // Replace with your WebSocket endpoint
     webSocket.binaryType = 'arraybuffer';
     

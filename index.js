@@ -23,6 +23,12 @@ var fs=require('fs')
 var _l = require('gqlodash').gqlodash
 var doq=require('gqdoq')
 
+shell="bash"
+if(os.platform()=="win32"){
+  shell="powershell.exe"#"powershell.exe"
+}
+console.log shell
+
 const options = {
     key: fs.readFileSync('./private/key.pem'),
     cert: fs.readFileSync('./private/cert.pem')
@@ -175,7 +181,7 @@ wss = new WebSocket.Server({server:sslserver});
 
 wss.on('connection', (ws) => {
     // Spawn a new PTY process for each client connection
-    const ptyProcess = pty.spawn('cmd.exe', [], { // Use 'cmd.exe' on Windows
+    const ptyProcess = pty.spawn(shell, [], { // Use 'cmd.exe' on Windows
         name: 'xterm-color',
         cols: 80,
         rows: 24,
