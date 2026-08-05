@@ -9,11 +9,12 @@ const basicAuth = require('express-basic-auth');
 const multer = require('multer');
 const WebSocket = require('ws');
 const pty = require('node-pty');
+const l = console.log
 var port=3443;
 
 var Datastore = require('nedb')
     , db = new Datastore({ filename: '~/.gqflow/nedb.json', autoload: true });
-console.log("nedb loaded...")
+l("nedb loaded...")
 //db.ensureIndex({ fieldName: 'id', unique: true });
 
 var gqfs = require('gqfs');
@@ -28,7 +29,7 @@ shell="bash"
 if(os.platform()=="win32"){
   shell="powershell.exe" //#"powershell.exe"
 }
-console.log(shell)
+l(shell)
 
 const options = {
     key: fs.readFileSync('./private/key.pem'),
@@ -61,7 +62,7 @@ function execCmd(command,cb){
             return;
         }
         cb(null,stdout)
-        console.log(`Command output (stdout):\n${stdout}`);
+        l(`Command output (stdout):\n${stdout}`);
     });
 }
 
@@ -86,13 +87,13 @@ app.post('/upload', upload.single('myFile'), (req, res) => {
 });
 
 app.post('/download', (req, res) => {
-    console.log(req.body);
+    l(req.body);
     res.send(gqfs.readFile(req.body.file));
-    console.log("Downloaded file: " + req.body.file);
+    l("Downloaded file: " + req.body.file);
 })
 
 app.post('/write', (req, res) => {
-    console.log(req.body)
+    l(req.body)
 
     if (!req.body.file) {
         return res.status(400).send('No file specified.');
@@ -106,7 +107,7 @@ app.post('/write', (req, res) => {
 
     msg = 'File saved successfully: ' + req.body.file
     res.send(msg)
-    console.log(msg)
+    l(msg)
 });
 
 app.post('/geteditorcontent', (req, res) => {
@@ -125,7 +126,7 @@ app.post('/editorcontent', (req, res) => {
     }
     db.update({ id: req.auth.user }, { $set: { content: req.body.content } }, { upsert: true }, function (err, numReplaced, upsert) {
         res.status(200).send("OK");
-        //console.log("editorcontent saved!")
+        //l("editorcontent saved!")
     });
 })
 
@@ -157,7 +158,7 @@ app.post('/path', (req, res) => {
 })
 
 app.post('/cmd', (req, res) => {
-    console.log(req.body)
+    l(req.body)
     execCmd(req.body.command, function (e, r) {
         if (e)
             res.status(400).send({ message: e });
@@ -167,7 +168,7 @@ app.post('/cmd', (req, res) => {
 });
 
 app.get('/user', (req,res) => {
-    console.log(req.auth.user);
+    l(req.auth.user);
     res.send(req.auth.user);
 })
 
@@ -175,46 +176,70 @@ app.get('/hello', (req, res) => {
     res.send('Hello from our server!')
 })
 
+startwss = function (wss) {
+    wss.on('connection', (ws) => {
+        // Spawn a new PTY process for each client connection
+        const ptyProcess = pty.spawn(shell, [], { // Use 'cmd.exe' on Windows
+            name: 'xterm-color',
+            cols: 80,
+            rows: 24,
+            cwd: process.env.HOME,
+            env: process.env
+        });
+
+        ws.isAlive = true;
+        // Reset flag on pong response
+        ws.on('pong', () => {
+            ws.isAlive = true;
+        });
+
+        const interval = setInterval(() => {
+            wss.clients.forEach((ws) => {
+                if (ws.isAlive === false) {
+                    return ws.terminate(); // Terminate dead connection immediately
+                }
+            
+                ws.isAlive = false;
+                ws.ping(); // Send ping frame
+            });
+        }, 30000);
+
+        l(`Client connected. PID: ${ptyProcess.pid}`);
+
+        // Listen for data from the PTY process and send it to the client over WebSocket
+        ptyProcess.on('data', function (data) {
+            ws.send(data);
+        });
+
+        // Listen for messages from the client (user input) and write it to the PTY process
+        ws.on('message', (message) => {
+            ptyProcess.write(message);
+        });
+
+        // Handle connection closure
+        ws.on('close', () => {
+            clearInterval(interval);
+            ptyProcess.kill(); // Kill the PTY process when the client disconnects
+            l(`Client disconnected. Killed PID: ${ptyProcess.pid}`);
+        });
+    });
+
+    l('wss listening');
+}
+
 server = http.createServer(app);
 sslserver = https.createServer(options, app);
 
-wss = new WebSocket.Server({server:sslserver});
+wss = new WebSocket.Server({ server: sslserver });
+wss2 = new WebSocket.Server({ server: server });
 
-wss.on('connection', (ws) => {
-    // Spawn a new PTY process for each client connection
-    const ptyProcess = pty.spawn(shell, [], { // Use 'cmd.exe' on Windows
-        name: 'xterm-color',
-        cols: 80,
-        rows: 24,
-        cwd: process.env.HOME,
-        env: process.env
-    });
+startwss(wss)
+startwss(wss2)
 
-    console.log(`Client connected. PID: ${ptyProcess.pid}`);
-
-    // Listen for data from the PTY process and send it to the client over WebSocket
-    ptyProcess.on('data', function (data) {
-        ws.send(data);
-    });
-
-    // Listen for messages from the client (user input) and write it to the PTY process
-    ws.on('message', (message) => {
-        ptyProcess.write(message);
-    });
-
-    // Handle connection closure
-    ws.on('close', () => {
-        ptyProcess.kill(); // Kill the PTY process when the client disconnects
-        console.log(`Client disconnected. Killed PID: ${ptyProcess.pid}`);
-    });
-});
-
-console.log('wss listening on port '+port);
-
-//server.listen(80, () => {
-//    console.log('server listening on port 80')
-//})
+server.listen(4070, () => {
+    l('server listening on port 80')
+})
 
 sslserver.listen(port,() => {
-    console.log('ssl server listening on port '+port)
+    l('ssl server listening on port '+port)
 })
